@@ -1,0 +1,454 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>PDF → HTML & YouTube Helper — Single File Tool</title>
+
+  <!-- Tailwind CDN (single-file friendly) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- PDF.js (for client-side PDF parsing & rendering) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+
+  <style>
+    /* small custom styles */
+    html,body { height:100%; }
+    .glass { background: rgba(255,255,255,0.06); backdrop-filter: blur(6px); }
+    /* for preview iframe full height within container */
+    .preview-frame { width:100%; height:60vh; border:1px solid rgba(0,0,0,0.06); border-radius:8px; }
+    /* simple loader */
+    .loader { border-top-color:transparent; border-radius:50%; width:36px; height:36px; border:4px solid rgba(255,255,255,0.2); border-top-color: white; animation:spin 1s linear infinite;}
+    @keyframes spin { to { transform:rotate(360deg); } }
+    /* small responsive tweaks */
+    @media (max-width:640px) {
+      .preview-frame { height:40vh; }
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-slate-900 to-slate-800 text-slate-100 min-h-screen">
+
+  <div class="max-w-6xl mx-auto p-6">
+    <header class="flex items-center justify-between mb-6">
+      <div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold">ToolBox — <span class="text-indigo-400">PDF → HTML</span> & <span class="text-emerald-400">YouTube Helper</span></h1>
+        <p class="text-slate-400 text-sm mt-1">Single-file, responsive UI. Client-side PDF conversion and YouTube embed/helper (safe mode).</p>
+      </div>
+      <div class="text-right text-xs text-slate-400">
+        <div>Made with ❤️ • No server required</div>
+      </div>
+    </header>
+
+    <main class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- Left: PDF → HTML -->
+      <section class="glass p-5 rounded-xl shadow-lg">
+        <div class="flex items-start justify-between">
+          <div>
+            <h2 class="text-xl font-semibold">PDF → HTML Converter</h2>
+            <p class="text-slate-300 text-sm mt-1">Upload a PDF and convert it to a self-contained HTML file (images + selectable text). Works fully in your browser.</p>
+          </div>
+          <div class="text-xs text-slate-400 text-right">
+            <div>Client-side • Privacy-first</div>
+            <div>Powered by PDF.js</div>
+          </div>
+        </div>
+
+        <div class="mt-4 space-y-3">
+          <label class="block">
+            <span class="text-slate-300 text-sm">Choose PDF</span>
+            <input id="pdfFile" type="file" accept="application/pdf" class="mt-2 block w-full text-sm text-slate-700 file:bg-slate-700 file:text-white file:rounded file:px-3 file:py-1 file:border-0" />
+          </label>
+
+          <div class="flex gap-2 items-center">
+            <label class="flex items-center gap-2">
+              <input id="includeText" type="checkbox" checked class="w-4 h-4" />
+              <span class="text-sm text-slate-300">Include extracted selectable text (if available)</span>
+            </label>
+            <label class="flex items-center gap-2 ml-4">
+              <input id="scale" type="number" value="1" min="0.5" step="0.1" class="w-20 text-black px-2 rounded" />
+              <span class="text-sm text-slate-300">Render scale (images)</span>
+            </label>
+          </div>
+
+          <div class="flex gap-2">
+            <button id="convertPdfBtn" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-md text-white">Convert & Preview</button>
+            <button id="downloadHtmlBtn" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 rounded-md text-white disabled:opacity-50" disabled>Download HTML</button>
+            <button id="clearPdfBtn" class="px-3 py-2 bg-slate-700 rounded-md text-slate-200">Clear</button>
+          </div>
+
+          <div id="pdfStatus" class="text-sm text-slate-300 mt-2"></div>
+        </div>
+
+        <div id="pdfPreviewWrap" class="mt-5">
+          <iframe id="pdfPreview" class="preview-frame bg-white" srcdoc="<p class='text-black p-4'>Converted HTML preview will appear here after conversion.</p>"></iframe>
+        </div>
+
+      </section>
+
+      <!-- Right: YouTube Helper -->
+      <section class="glass p-5 rounded-xl shadow-lg">
+        <div class="flex items-start justify-between">
+          <div>
+            <h2 class="text-xl font-semibold">YouTube Helper (Safe)</h2>
+            <p class="text-slate-300 text-sm mt-1">Paste a YouTube URL to get metadata, embed code, and a downloadable embed page. This tool intentionally <em>doesn't</em> fetch the raw video file.</p>
+          </div>
+          <div class="text-xs text-slate-400 text-right">
+            <div>Safe • Compliant</div>
+          </div>
+        </div>
+
+        <div class="mt-4 space-y-3">
+          <input id="ytUrl" type="url" placeholder="https://www.youtube.com/watch?v=VIDEO_ID or youtu.be/VIDEO_ID" class="w-full px-3 py-2 rounded bg-slate-900 text-slate-100" />
+
+          <div class="flex gap-2">
+            <button id="fetchYtBtn" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-md text-white">Fetch Info</button>
+            <button id="embedDownloadBtn" class="px-4 py-2 bg-emerald-600 rounded-md text-white disabled:opacity-50" disabled>Download Embed HTML</button>
+            <button id="clearYtBtn" class="px-3 py-2 bg-slate-700 rounded-md text-slate-200">Clear</button>
+          </div>
+
+          <div id="ytStatus" class="text-sm text-slate-300 mt-2"></div>
+
+          <div id="ytResult" class="mt-3 hidden">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 items-start">
+              <div>
+                <img id="ytThumb" src="" alt="thumbnail" class="w-full rounded shadow" />
+              </div>
+              <div class="sm:col-span-2">
+                <h3 id="ytTitle" class="font-semibold text-lg"></h3>
+                <p id="ytAuthor" class="text-sm text-slate-300"></p>
+                <p id="ytDesc" class="text-sm text-slate-300 mt-2 line-clamp-4"></p>
+
+                <div class="mt-3 space-y-2">
+                  <label class="block text-slate-300 text-sm">Embed Options</label>
+                  <div class="flex gap-2 items-center">
+                    <label class="flex items-center gap-2 text-sm">
+                      <input id="allowFullscreen" type="checkbox" checked class="w-4 h-4" />
+                      <span>Allow fullscreen</span>
+                    </label>
+                    <label class="flex items-center gap-2 text-sm ml-4">
+                      <input id="responsiveEmbed" type="checkbox" checked class="w-4 h-4" />
+                      <span>Responsive embed</span>
+                    </label>
+                  </div>
+
+                  <label class="block text-slate-300 text-sm mt-2">Embed code (copy & paste)</label>
+                  <textarea id="embedCode" rows="4" class="w-full p-2 bg-slate-900 rounded text-slate-200 font-mono text-sm"></textarea>
+
+                  <div class="mt-2">
+                    <a id="openInYT" target="_blank" class="inline-block px-3 py-1 bg-yellow-500 text-black rounded">Open on YouTube</a>
+                    <button id="copyEmbedBtn" class="ml-2 px-3 py-1 bg-indigo-500 rounded text-white">Copy embed</button>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="mt-6 text-xs text-slate-400">
+          <strong>Reminder:</strong> This helper provides embed pages and metadata only. For downloading full videos, use YouTube's official features (YouTube Premium) or creators' provided downloads, and always respect copyright.
+        </div>
+      </section>
+    </main>
+
+    <footer class="mt-8 text-center text-slate-400 text-sm">
+      Built for demo & learning. Host in modern browsers for best results.
+    </footer>
+  </div>
+
+  <script>
+    // PDF.js setup
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+
+    const pdfFileInput = document.getElementById('pdfFile');
+    const convertPdfBtn = document.getElementById('convertPdfBtn');
+    const downloadHtmlBtn = document.getElementById('downloadHtmlBtn');
+    const clearPdfBtn = document.getElementById('clearPdfBtn');
+    const pdfStatus = document.getElementById('pdfStatus');
+    const pdfPreview = document.getElementById('pdfPreview');
+    const includeTextCheckbox = document.getElementById('includeText');
+    const scaleInput = document.getElementById('scale');
+
+    let lastGeneratedHtml = null;
+
+    clearPdfBtn.addEventListener('click', () => {
+      pdfFileInput.value = '';
+      pdfPreview.srcdoc = '<p class="text-black p-4">Converted HTML preview will appear here after conversion.</p>';
+      pdfStatus.textContent = '';
+      downloadHtmlBtn.disabled = true;
+      lastGeneratedHtml = null;
+    });
+
+    convertPdfBtn.addEventListener('click', async () => {
+      const file = pdfFileInput.files && pdfFileInput.files[0];
+      if (!file) {
+        pdfStatus.textContent = 'Please choose a PDF file first.';
+        return;
+      }
+      pdfStatus.innerHTML = 'Reading PDF... <span class="inline-block loader align-middle ml-2"></span>';
+      downloadHtmlBtn.disabled = true;
+
+      try {
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        const numPages = pdf.numPages;
+        const includeText = includeTextCheckbox.checked;
+        const scale = parseFloat(scaleInput.value) || 1;
+
+        // Build a standalone HTML page
+        let htmlParts = [];
+        htmlParts.push(`<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(file.name)} — converted</title>`);
+        // small inline style
+        htmlParts.push(`<style>body{font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial; background:#fff;color:#111;margin:0;padding:20px} .pdf-page{box-shadow:0 6px 18px rgba(0,0,0,0.08); margin:20px auto; max-width:960px} img{max-width:100%;display:block} .text-layer{margin-top:8px;white-space:pre-wrap;line-height:1.4}</style>`);
+        htmlParts.push(`</head><body>`);
+        htmlParts.push(`<h1 style="font-size:18px;margin:0 0 12px">${escapeHtml(file.name)} — Converted at ${new Date().toLocaleString()}</h1>`);
+
+        for (let p = 1; p <= numPages; p++) {
+          pdfStatus.innerHTML = `Rendering page ${p}/${numPages}... <span class="inline-block loader align-middle ml-2"></span>`;
+          const page = await pdf.getPage(p);
+
+          // render to canvas to get image data
+          const viewport = page.getViewport({ scale: scale * 1.5 }); // higher internal res
+          const canvas = document.createElement('canvas');
+          const context = canvas.getContext('2d');
+          canvas.width = Math.floor(viewport.width);
+          canvas.height = Math.floor(viewport.height);
+
+          await page.render({ canvasContext: context, viewport }).promise;
+          const imgData = canvas.toDataURL('image/png');
+
+          htmlParts.push(`<div class="pdf-page" style="padding:10px; background:#fff; border-radius:8px">`);
+          htmlParts.push(`<img src="${imgData}" alt="page ${p}" />`);
+
+          if (includeText) {
+            try {
+              const txt = await page.getTextContent();
+              // assemble lines approximatively
+              const strings = txt.items.map(i => i.str);
+              const joined = strings.join(' ');
+              const safe = escapeHtml(joined);
+              htmlParts.push(`<div class="text-layer">${safe}</div>`);
+            } catch (e) {
+              // ignore if text extraction fails
+            }
+          }
+
+          htmlParts.push(`</div>`);
+          // small delay to keep UI responsive
+          await new Promise(r=>setTimeout(r, 50));
+        }
+
+        htmlParts.push(`</body></html>`);
+        const finalHtml = htmlParts.join('');
+        lastGeneratedHtml = finalHtml;
+
+        // preview in iframe using srcdoc
+        pdfPreview.srcdoc = finalHtml;
+        pdfStatus.textContent = `Conversion complete — ${numPages} page(s) rendered. Preview shown.`;
+        downloadHtmlBtn.disabled = false;
+
+      } catch (err) {
+        console.error(err);
+        pdfStatus.textContent = 'Conversion failed. See console for details.';
+        downloadHtmlBtn.disabled = true;
+      }
+    });
+
+    downloadHtmlBtn.addEventListener('click', () => {
+      if (!lastGeneratedHtml) return;
+      const blob = new Blob([lastGeneratedHtml], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = (document.getElementById('pdfFile').files[0]?.name || 'converted') + '.html';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    });
+
+
+    // ---------- YouTube helper ----------
+    const ytUrlInput = document.getElementById('ytUrl');
+    const fetchYtBtn = document.getElementById('fetchYtBtn');
+    const ytStatus = document.getElementById('ytStatus');
+    const ytResult = document.getElementById('ytResult');
+    const ytThumb = document.getElementById('ytThumb');
+    const ytTitle = document.getElementById('ytTitle');
+    const ytAuthor = document.getElementById('ytAuthor');
+    const ytDesc = document.getElementById('ytDesc');
+    const embedCodeTA = document.getElementById('embedCode');
+    const copyEmbedBtn = document.getElementById('copyEmbedBtn');
+    const allowFullscreenCheckbox = document.getElementById('allowFullscreen');
+    const responsiveEmbedCheckbox = document.getElementById('responsiveEmbed');
+    const embedDownloadBtn = document.getElementById('embedDownloadBtn');
+    const openInYT = document.getElementById('openInYT');
+    const clearYtBtn = document.getElementById('clearYtBtn');
+
+    let lastYtId = null;
+    let lastYtTitle = '';
+
+    fetchYtBtn.addEventListener('click', async () => {
+      const url = ytUrlInput.value.trim();
+      if (!url) { ytStatus.textContent = 'Please paste a YouTube URL.'; return; }
+      ytStatus.innerHTML = 'Fetching metadata... <span class="inline-block loader align-middle ml-2"></span>';
+      ytResult.classList.add('hidden');
+      embedDownloadBtn.disabled = true;
+
+      // parse video id
+      const id = extractYtId(url);
+      if (!id) { ytStatus.textContent = 'Could not parse a YouTube video ID from the URL.'; return; }
+      lastYtId = id;
+
+      try {
+        // use noembed service which supports many providers and returns JSON
+        // noembed.com supports CORS; if blocked, we'll fallback to building minimal info.
+        const noembedUrl = 'https://noembed.com/embed?url=' + encodeURIComponent('https://www.youtube.com/watch?v=' + id);
+        const resp = await fetch(noembedUrl);
+        if (!resp.ok) throw new Error('noembed failed');
+        const data = await resp.json();
+
+        const title = data.title || ('YouTube video ' + id);
+        const author = data.author_name || '';
+        const thumbnail = data.thumbnail_url || `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
+        const description = data.description || '';
+
+        lastYtTitle = title;
+
+        // update UI
+        ytThumb.src = thumbnail;
+        ytTitle.textContent = title;
+        ytAuthor.textContent = author;
+        ytDesc.textContent = description;
+        openInYT.href = 'https://www.youtube.com/watch?v=' + id;
+
+        // build embed code
+        buildEmbedCode(id);
+
+        ytStatus.textContent = 'Metadata fetched.';
+        ytResult.classList.remove('hidden');
+        embedDownloadBtn.disabled = false;
+
+      } catch (err) {
+        console.warn('noembed failed or blocked', err);
+        // fallback: still show embed & thumbnail via known URL patterns
+        const thumbnail = `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
+        ytThumb.src = thumbnail;
+        const title = 'YouTube Video';
+        ytTitle.textContent = title;
+        ytAuthor.textContent = '';
+        ytDesc.textContent = '';
+        openInYT.href = 'https://www.youtube.com/watch?v=' + id;
+        buildEmbedCode(id);
+        ytStatus.textContent = 'Limited metadata (CORS blocked). Embed available.';
+        ytResult.classList.remove('hidden');
+        embedDownloadBtn.disabled = false;
+      }
+    });
+
+    function buildEmbedCode(id) {
+      const allowFs = allowFullscreenCheckbox.checked ? ' allowfullscreen' : '';
+      const responsive = responsiveEmbedCheckbox.checked;
+      let code = '';
+      if (responsive) {
+        code = `<div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;max-width:100%;">\n` +
+               `  <iframe src="https://www.youtube.com/embed/${id}" frameborder="0" style="position:absolute;top:0;left:0;width:100%;height:100%;"${allowFs}></iframe>\n` +
+               `</div>`;
+      } else {
+        code = `<iframe width="560" height="315" src="https://www.youtube.com/embed/${id}" frameborder="0"${allowFs}></iframe>`;
+      }
+      embedCodeTA.value = code;
+    }
+
+    // rebuild embed when options change
+    allowFullscreenCheckbox.addEventListener('change', () => lastYtId && buildEmbedCode(lastYtId));
+    responsiveEmbedCheckbox.addEventListener('change', () => lastYtId && buildEmbedCode(lastYtId));
+
+    copyEmbedBtn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(embedCodeTA.value);
+        ytStatus.textContent = 'Embed code copied to clipboard.';
+      } catch (e) {
+        ytStatus.textContent = 'Copy failed. Select the text and copy manually.';
+      }
+    });
+
+    embedDownloadBtn.addEventListener('click', () => {
+      if (!lastYtId) return;
+      const allowFs = allowFullscreenCheckbox.checked ? ' allowfullscreen' : '';
+      const responsive = responsiveEmbedCheckbox.checked;
+      let inner = '';
+      if (responsive) {
+        inner = `<div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;max-width:100%;">\n` +
+               `  <iframe src="https://www.youtube.com/embed/${lastYtId}" frameborder="0" style="position:absolute;top:0;left:0;width:100%;height:100%;"${allowFs}></iframe>\n` +
+               `</div>`;
+      } else {
+        inner = `<iframe width="560" height="315" src="https://www.youtube.com/embed/${lastYtId}" frameborder="0"${allowFs}></iframe>`;
+      }
+
+      const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(lastYtTitle)}</title></head><body style="font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial;padding:20px;background:#fff;color:#111">${inner}<hr style="margin-top:18px"><p style="font-size:13px;color:#444">Embedded from YouTube: <a href="https://www.youtube.com/watch?v=${lastYtId}" target="_blank">Open on YouTube</a></p></body></html>`;
+
+      const blob = new Blob([html], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `youtube-${lastYtId}.html`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    });
+
+    clearYtBtn.addEventListener('click', () => {
+      ytUrlInput.value = '';
+      ytResult.classList.add('hidden');
+      ytStatus.textContent = '';
+      embedDownloadBtn.disabled = true;
+      embedCodeTA.value = '';
+      lastYtId = null;
+      lastYtTitle = '';
+    });
+
+    // helper: extract video id robustly
+    function extractYtId(url) {
+      try {
+        // common patterns
+        const u = url.trim();
+        const patterns = [
+          /(?:youtube\\.com\\/watch\\?v=|youtube\\.com\\/embed\\/|youtube\\.com\\/v\\/)([A-Za-z0-9_-]{11})/,
+          /(?:youtu\\.be\\/)([A-Za-z0-9_-]{11})/,
+          /[?&]v=([A-Za-z0-9_-]{11})/
+        ];
+        for (const p of patterns) {
+          const m = u.match(p);
+          if (m && m[1]) return m[1];
+        }
+        // fallback: last 11-char token
+        const maybe = u.split(/[^A-Za-z0-9_-]/).find(t => t.length === 11);
+        if (maybe) return maybe;
+        return null;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    // small escape utility
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, function (m) {
+        return ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[m];
+      });
+    }
+
+    // minor UX: update embed if user changes checkboxes even before fetch
+    document.querySelectorAll('#allowFullscreen, #responsiveEmbed').forEach(el => {
+      el.addEventListener('change', () => { if (lastYtId) buildEmbedCode(lastYtId); });
+    });
+
+    // Accessibility: allow pressing Enter to trigger fetch
+    ytUrlInput.addEventListener('keyup', (e) => { if (e.key === 'Enter') fetchYtBtn.click(); });
+
+  </script>
+
+</body>
+</html>
