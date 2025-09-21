@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ToolHub - 100+ Useful Web Tools</title>
+    <title>ToolFace - 100+ Useful Online Tools</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -17,6 +17,9 @@
             --card-bg: #FFFFFF;
             --header-bg: #3A0CA3;
             --footer-bg: #212529;
+            --sidebar-bg: #3A0CA3;
+            --sidebar-text: #FFFFFF;
+            --sidebar-hover: #7209B7;
         }
 
         * {
@@ -178,6 +181,58 @@
             border-radius: 2px;
         }
 
+        /* Categories Section */
+        .categories {
+            background-color: var(--light);
+            padding: 50px 0;
+            border-radius: 15px;
+            margin: 40px 0;
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .category-card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            cursor: pointer;
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .category-card i {
+            font-size: 2.2rem;
+            margin-bottom: 15px;
+            color: var(--primary);
+            background: rgba(67, 97, 238, 0.1);
+            width: 70px;
+            height: 70px;
+            line-height: 70px;
+            border-radius: 50%;
+            text-align: center;
+        }
+
+        .category-card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+
+        .category-card p {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
         /* Tools Grid */
         .tools-grid {
             display: grid;
@@ -223,38 +278,77 @@
             color: #6c757d;
         }
 
-        /* Ad Containers */
-        .ad-container {
+        /* Video Downloader Section */
+        .video-downloader {
+            background: linear-gradient(to right, #4361EE, #3A0CA3);
+            padding: 60px 0;
+            border-radius: 15px;
+            margin: 50px 0;
+            color: white;
+        }
+
+        .video-downloader .section-title {
+            color: white;
+        }
+
+        .video-downloader .section-title:after {
             background: white;
+        }
+
+        .platforms {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .platform {
+            background-color: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 25px;
+            border-radius: 10px;
+            width: 200px;
+            text-align: center;
+            transition: transform 0.3s ease;
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .platform:hover {
+            transform: translateY(-8px);
+            background-color: rgba(255, 255, 255, 0.25);
+        }
+
+        .platform i {
+            font-size: 2.8rem;
+            margin-bottom: 15px;
+            color: white;
+        }
+
+        .platform h3 {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+        }
+
+        /* AdMob Ad Placeholder */
+        .ad-container {
+            background: linear-gradient(to right, #f5f5f5, #e0e0e0);
             border-radius: 10px;
             padding: 20px;
             margin: 40px 0;
             text-align: center;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-            border: 1px solid #e9ecef;
+            border: 2px dashed #ccc;
         }
 
-        .ad-title {
-            font-weight: bold;
-            color: var(--primary);
+        .ad-container h3 {
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        .ad-container p {
+            color: #777;
             margin-bottom: 15px;
-            font-size: 1.2rem;
-        }
-
-        .ad-code {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 5px;
-            margin: 15px 0;
-            font-family: monospace;
-            text-align: left;
-            overflow-x: auto;
-        }
-
-        .ad-note {
-            color: #6c757d;
-            font-size: 0.9rem;
-            margin-top: 15px;
         }
 
         /* Footer */
@@ -323,12 +417,14 @@
 
         /* Responsive Design */
         @media (max-width: 1200px) {
+            .categories-grid,
             .tools-grid {
                 grid-template-columns: repeat(3, 1fr);
             }
         }
 
         @media (max-width: 992px) {
+            .categories-grid,
             .tools-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
@@ -367,8 +463,19 @@
                 font-size: 2.2rem;
             }
             
+            .categories-grid,
             .tools-grid {
                 grid-template-columns: 1fr;
+            }
+            
+            .platforms {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .platform {
+                width: 100%;
+                max-width: 300px;
             }
         }
 
@@ -398,14 +505,15 @@
             <div class="header-content">
                 <div class="logo">
                     <i class="fas fa-tools logo-icon"></i>
-                    <h1>ToolHub</h1>
+                    <h1>ToolFace</h1>
                 </div>
                 
                 <nav>
                     <ul>
                         <li><a href="#home">Home</a></li>
-                        <li><a href="#tools">All Tools</a></li>
-                        <li><a href="#categories">Categories</a></li>
+                        <li><a href="#tools">Tools</a></li>
+                        <li><a href="#video-downloader">Video Downloader</a></li>
+                        <li><a href="#blog">Blog</a></li>
                         <li><a href="#contact">Contact</a></li>
                     </ul>
                 </nav>
@@ -422,36 +530,77 @@
     <section class="hero" id="home">
         <div class="container">
             <h2>100+ Tools for All Your Needs</h2>
-            <p>ToolHub offers the most comprehensive collection of free online tools - from media processing to utilities and converters.</p>
-            <a href="#tools" class="btn">Explore Tools</a>
+            <p>ToolFace offers the most comprehensive collection of free online tools - from media processing to utilities and converters.</p>
+            <a href="#categories" class="btn">Explore Tools</a>
         </div>
     </section>
 
-    <!-- Ad Container - Top -->
+    <!-- AdMob Ad Placeholder -->
     <div class="container">
         <div class="ad-container">
-            <div class="ad-title">AdMob Advertisement</div>
-            <p>This is where your AdMob ad would appear</p>
-            <div class="ad-code">
-                &lt;!-- AdMAd Code --&gt;<br>
-                &lt;script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-your-publisher-id" crossorigin="anonymous"&gt;&lt;/script&gt;<br>
-                &lt;ins class="adsbygoogle"<br>
-                &nbsp;&nbsp;&nbsp;&nbsp;style="display:block"<br>
-                &nbsp;&nbsp;&nbsp;&nbsp;data-ad-client="ca-pub-your-publisher-id"<br>
-                &nbsp;&nbsp;&nbsp;&nbsp;data-ad-slot="your-ad-slot-id"<br>
-                &nbsp;&nbsp;&nbsp;&nbsp;data-ad-format="auto"&gt;<br>
-                &lt;/ins&gt;<br>
-                &lt;script&gt;<br>
-                &nbsp;&nbsp;&nbsp;&nbsp;(adsbygoogle = window.adsbygoogle || []).push({});<br>
-                &lt;/script&gt;
-            </div>
-            <div class="ad-note">Replace "your-publisher-id" and "your-ad-slot-id" with your actual AdMob IDs</div>
+            <h3>AdMob Ad Space</h3>
+            <p>This is where your AdMob ads will appear</p>
+            <button class="btn">Learn More</button>
         </div>
     </div>
 
-    <!-- All Tools Section -->
+    <!-- Categories Section -->
+    <section class="container" id="categories">
+        <h2 class="section-title">Tool Categories</h2>
+        <div class="categories-grid">
+            <div class="category-card" onclick="showCategory('image-tools')">
+                <i class="fas fa-image"></i>
+                <h3>Image Tools</h3>
+                <p>15 tools</p>
+            </div>
+            
+            <div class="category-card" onclick="showCategory('video-tools')">
+                <i class="fas fa-video"></i>
+                <h3>Video Tools</h3>
+                <p>12 tools</p>
+            </div>
+            
+            <div class="category-card" onclick="showCategory('audio-tools')">
+                <i class="fas fa-music"></i>
+                <h3>Audio Tools</h3>
+                <p>8 tools</p>
+            </div>
+            
+            <div class="category-card" onclick="showCategory('converter-tools')">
+                <i class="fas fa-exchange-alt"></i>
+                <h3>Converters</h3>
+                <p>10 tools</p>
+            </div>
+            
+            <div class="category-card" onclick="showCategory('calculator-tools')">
+                <i class="fas fa-calculator"></i>
+                <h3>Calculators</h3>
+                <p>18 tools</p>
+            </div>
+            
+            <div class="category-card" onclick="showCategory('text-tools')">
+                <i class="fas fa-font"></i>
+                <h3>Text Tools</h3>
+                <p>14 tools</p>
+            </div>
+            
+            <div class="category-card" onclick="showCategory('developer-tools')">
+                <i class="fas fa-code"></i>
+                <h3>Developer Tools</h3>
+                <p>22 tools</p>
+            </div>
+            
+            <div class="category-card" onclick="showCategory('productivity-tools')">
+                <i class="fas fa-tasks"></i>
+                <h3>Productivity</h3>
+                <p>9 tools</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Popular Tools Section -->
     <section class="container" id="tools">
-        <h2 class="section-title">All Tools</h2>
+        <h2 class="section-title">Popular Tools</h2>
         <div class="tools-grid">
             <!-- Tool 1 -->
             <div class="tool-card">
@@ -516,172 +665,129 @@
                 <p>Trim and edit audio files easily</p>
                 <button class="btn">Use Tool</button>
             </div>
+        </div>
+    </section>
 
-            <!-- Add more tools here following the same pattern -->
-            <!-- Tool 9 -->
+    <!-- Video Downloader Section -->
+    <section class="video-downloader" id="video-downloader">
+        <div class="container">
+            <h2 class="section-title">Video Downloader</h2>
+            <p class="section-description" style="text-align: center; margin-bottom: 30px;">Download videos from various platforms quickly and easily</p>
+            
+            <div class="platforms">
+                <div class="platform">
+                    <i class="fab fa-youtube"></i>
+                    <h3>YouTube Downloader</h3>
+                    <p>Download YouTube videos in multiple formats</p>
+                </div>
+                
+                <div class="platform">
+                    <i class="fab fa-tiktok"></i>
+                    <h3>TikTok Downloader</h3>
+                    <p>Save TikTok videos without watermark</p>
+                </div>
+                
+                <div class="platform">
+                    <i class="fab fa-instagram"></i>
+                    <h3>Instagram Downloader</h3>
+                    <p>Download Instagram videos and reels</p>
+                </div>
+                
+                <div class="platform">
+                    <i class="fab fa-facebook"></i>
+                    <h3>Facebook Downloader</h3>
+                    <p>Save videos from Facebook easily</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- AdMob Ad Placeholder -->
+    <div class="container">
+        <div class="ad-container">
+            <h3>AdMob Ad Space</h3>
+            <p>This is where your AdMob ads will appear</p>
+            <button class="btn">Learn More</button>
+        </div>
+    </div>
+
+    <!-- Calculator Tools Section -->
+    <section class="container" id="calculator-tools">
+        <h2 class="section-title">Calculator Tools</h2>
+        <div class="tools-grid">
             <div class="tool-card">
-                <i class="fas fa-file-pdf"></i>
-                <h3>PDF to Word</h3>
-                <p>Convert PDF documents to editable Word files</p>
+                <i class="fas fa-calculator"></i>
+                <h3>Age Calculator</h3>
+                <p>Calculate exact age or time between dates</p>
                 <button class="btn">Use Tool</button>
             </div>
             
-            <!-- Tool 10 -->
             <div class="tool-card">
-                <i class="fas fa-qrcode"></i>
-                <h3>QR Generator</h3>
-                <p>Create custom QR codes for URLs and information</p>
+                <i class="fas fa-weight"></i>
+                <h3>BMI Calculator</h3>
+                <p>Calculate Body Mass Index</p>
                 <button class="btn">Use Tool</button>
             </div>
             
-            <!-- Tool 11 -->
             <div class="tool-card">
-                <i class="fas fa-language"></i>
-                <h3>Text Translator</h3>
-                <p>Translate text between multiple languages</p>
+                <i class="fas fa-money-bill-wave"></i>
+                <h3>EMI Calculator</h3>
+                <p>Calculate Equated Monthly Installments</p>
                 <button class="btn">Use Tool</button>
             </div>
             
-            <!-- Tool 12 -->
+            <div class="tool-card">
+                <i class="fas fa-chart-line"></i>
+                <h3>SIP Calculator</h3>
+                <p>Plan your investments with SIP</p>
+                <button class="btn">Use Tool</button>
+            </div>
+            
+            <div class="tool-card">
+                <i class="fas fa-percentage"></i>
+                <h3>Percentage Calculator</h3>
+                <p>Calculate percentages easily</p>
+                <button class="btn">Use Tool</button>
+            </div>
+            
+            <div class="tool-card">
+                <i class="fas fa-calendar-alt"></i>
+                <h3>Date Calculator</h3>
+                <p>Calculate difference between dates</p>
+                <button class="btn">Use Tool</button>
+            </div>
+            
             <div class="tool-card">
                 <i class="fas fa-ruler"></i>
                 <h3>Unit Converter</h3>
-                <p>Convert between different measurement units</p>
+                <p>Convert between different units</p>
+                <button class="btn">Use Tool</button>
+            </div>
+            
+            <div class="tool-card">
+                <i class="fas fa-coins"></i>
+                <h3>Currency Converter</h3>
+                <p>Convert between world currencies</p>
                 <button class="btn">Use Tool</button>
             </div>
         </div>
-
-        <!-- View More Button -->
-        <div style="text-align: center; margin-bottom: 50px;">
-            <button class="btn">Load More Tools</button>
-        </div>
     </section>
-
-    <!-- Ad Container - Middle -->
-    <div class="container">
-        <div class="ad-container">
-            <div class="ad-title">AdMob Banner Ad</div>
-            <p>This is where your AdMob banner would appear</p>
-            <div class="ad-code">
-                &lt;!-- AdMob Banner Code --&gt;<br>
-                &lt;script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-your-publisher-id" crossorigin="anonymous"&gt;&lt;/script&gt;<br>
-                &lt;ins class="adsbygoogle"<br>
-                &nbsp;&nbsp;&nbsp;&nbsp;style="display:inline-block;width:728px;height:90px"<br>
-                &nbsp;&nbsp;&nbsp;&nbsp;data-ad-client="ca-pub-your-publisher-id"<br>
-                &nbsp;&nbsp;&nbsp;&nbsp;data-ad-slot="your-banner-ad-slot-id"&gt;<br>
-                &lt;/ins&gt;<br>
-                &lt;script&gt;<br>
-                &nbsp;&nbsp;&nbsp;&nbsp;(adsbygoogle = window.adsbygoogle || []).push({});<br>
-                &lt;/script&gt;
-            </div>
-        </div>
-    </div>
-
-    <!-- Categories Section -->
-    <section class="container" id="categories">
-        <h2 class="section-title">Tool Categories</h2>
-        <div class="tools-grid">
-            <!-- Category 1 -->
-            <div class="tool-card">
-                <i class="fas fa-image"></i>
-                <h3>Image Tools</h3>
-                <p>15+ tools for image editing and conversion</p>
-                <button class="btn">View Tools</button>
-            </div>
-            
-            <!-- Category 2 -->
-            <div class="tool-card">
-                <i class="fas fa-video"></i>
-                <h3>Video Tools</h3>
-                <p>12+ tools for video processing</p>
-                <button class="btn">View Tools</button>
-            </div>
-            
-            <!-- Category 3 -->
-            <div class="tool-card">
-                <i class="fas fa-music"></i>
-                <h3>Audio Tools</h3>
-                <p>8+ tools for audio editing</p>
-                <button class="btn">View Tools</button>
-            </div>
-            
-            <!-- Category 4 -->
-            <div class="tool-card">
-                <i class="fas fa-exchange-alt"></i>
-                <h3>Converters</h3>
-                <p>10+ conversion tools</p>
-                <button class="btn">View Tools</button>
-            </div>
-            
-            <!-- Category 5 -->
-            <div class="tool-card">
-                <i class="fas fa-calculator"></i>
-                <h3>Calculators</h3>
-                <p>18+ calculation tools</p>
-                <button class="btn">View Tools</button>
-            </div>
-            
-            <!-- Category 6 -->
-            <div class="tool-card">
-                <i class="fas fa-font"></i>
-                <h3>Text Tools</h3>
-                <p>14+ text manipulation tools</p>
-                <button class="btn">View Tools</button>
-            </div>
-            
-            <!-- Category 7 -->
-            <div class="tool-card">
-                <i class="fas fa-code"></i>
-                <h3>Developer Tools</h3>
-                <p>22+ tools for developers</p>
-                <button class="btn">View Tools</button>
-            </div>
-            
-            <!-- Category 8 -->
-            <div class="tool-card">
-                <i class="fas fa-tasks"></i>
-                <h3>Productivity</h3>
-                <p>9+ productivity tools</p>
-                <button class="btn">View Tools</button>
-            </div>
-        </div>
-    </section>
-
-    <!-- Ad Container - Bottom -->
-    <div class="container">
-        <div class="ad-container">
-            <div class="ad-title">AdMob Native Ad</div>
-            <p>This is where your AdMob native ad would appear</p>
-            <div class="ad-code">
-                &lt;!-- AdMob Native Ad Code --&gt;<br>
-                &lt;script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-your-publisher-id" crossorigin="anonymous"&gt;&lt;/script&gt;<br>
-                &lt;ins class="adsbygoogle"<br>
-                &nbsp;&nbsp;&nbsp;&nbsp;style="display:block"<br>
-                &nbsp;&nbsp;&nbsp;&nbsp;data-ad-format="autorelaxed"<br>
-                &nbsp;&nbsp;&nbsp;&nbsp;data-ad-client="ca-pub-your-publisher-id"<br>
-                &nbsp;&nbsp;&nbsp;&nbsp;data-ad-slot="your-native-ad-slot-id"&gt;<br>
-                &lt;/ins&gt;<br>
-                &lt;script&gt;<br>
-                &nbsp;&nbsp;&nbsp;&nbsp;(adsbygoogle = window.adsbygoogle || []).push({});<br>
-                &lt;/script&gt;
-            </div>
-        </div>
-    </div>
 
     <!-- Footer -->
     <footer>
         <div class="container">
             <div class="footer-content">
                 <div class="footer-section">
-                    <h3>ToolHub</h3>
+                    <h3>ToolFace</h3>
                     <p>Your all-in-one solution for web tools. We provide free, easy-to-use tools for everyone.</p>
                 </div>
                 
                 <div class="footer-section">
                     <h3>Quick Links</h3>
                     <a href="#home">Home</a>
-                    <a href="#tools">All Tools</a>
-                    <a href="#categories">Categories</a>
+                    <a href="#tools">Tools</a>
+                    <a href="#video-downloader">Video Downloader</a>
+                    <a href="#blog">Blog</a>
                     <a href="#contact">Contact</a>
                 </div>
                 
@@ -710,7 +816,7 @@
             </div>
             
             <div class="copyright">
-                <p>&copy; 2023 ToolHub. All rights reserved.</p>
+                <p>&copy; 2023 ToolFace. All rights reserved.</p>
             </div>
         </div>
     </footer>
@@ -730,15 +836,32 @@
             button.addEventListener('click', function() {
                 const toolName = this.parentElement.querySelector('h3').textContent;
                 alert(`Redirecting to ${toolName}`);
-                // In a real implementation, this would navigate to the tool page
             });
         });
 
-        // Load more functionality
-        document.querySelector('.btn').addEventListener('click', function() {
-            alert('Loading more tools...');
-            // In a real implementation, this would load more tools
+        // Platform click functionality
+        document.querySelectorAll('.platform').forEach(platform => {
+            platform.addEventListener('click', function() {
+                const platformName = this.querySelector('h3').textContent;
+                alert(`Redirecting to ${platformName}`);
+            });
         });
+
+        // Show category function
+        function showCategory(categoryId) {
+            alert(`Showing tools for ${categoryId.replace('-', ' ')}`);
+            // In a real implementation, this would filter tools by category
+        }
+
+        // AdMob integration code (example)
+        // This is a placeholder for actual AdMob code
+        function loadAdMobAds() {
+            console.log("AdMob ads would be loaded here");
+            // Actual AdMob code would go here
+        }
+
+        // Initialize AdMob on page load
+        window.addEventListener('load', loadAdMobAds);
     </script>
 </body>
 </html>
